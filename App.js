@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, TouchableOpacity, StyleSheet, Text, View, Image, useWindowDimensions, Modal, Pressable, Alert, ToastAndroid } from 'react-native';
+import { AsyncStorage } from 'react-native';
 
 export default function App() {
   const { height, width } = useWindowDimensions();
@@ -10,7 +11,7 @@ export default function App() {
   const isCorrect = useRef(false);
   const nameCorrect = useRef('');
   const indexCountry = useRef(0);
-  useEffect(() => {
+  const fetchData = () => {
     countries.sort(() => Math.random() - 0.5);
     setCountry(countries[0]);
     const arrChose0 = countries[0].chose;
@@ -22,6 +23,9 @@ export default function App() {
         nameCorrect.current = element.name;
       }
     });
+  }
+  useEffect(() => {
+    fetchData();
   }, []);
 
   const onCheckCorrect = (correct, index) => {
@@ -29,8 +33,10 @@ export default function App() {
     setIsShowModal(true);
   }
   const onNextQuizz = () => {
-    if (indexCountry >= countries.length - 1) {
+    if (indexCountry.current >= countries.length - 1) {
       ToastAndroid.show('You are god!!!', ToastAndroid.SHORT);
+      fetchData();
+      setIsShowModal(false);
       return;
     }
     setCountry(countries[indexCountry.current + 1]);
@@ -174,7 +180,6 @@ const styles = StyleSheet.create({
 });
 const countries = [
   {
-    id: 1,
     flag: "Vietnam",
     image: "https://flagpedia.net/data/flags/w702/vn.webp",
     chose: [
@@ -197,7 +202,6 @@ const countries = [
     ]
   },
   {
-    id: 2,
     flag: "United States of America",
     image: "https://flagpedia.net/data/flags/w702/us.webp",
     chose: [
@@ -220,7 +224,6 @@ const countries = [
     ]
   },
   {
-    id: 3,
     flag: "France",
     image: "https://flagpedia.net/data/flags/w702/fr.webp",
     chose: [
@@ -243,7 +246,6 @@ const countries = [
     ]
   },
   {
-    id: 4,
     flag: "Japan",
     image: "https://flagpedia.net/data/flags/w702/jp.webp",
     chose: [
@@ -266,7 +268,6 @@ const countries = [
     ]
   },
   {
-    id: 5,
     flag: "Brazil",
     image: "https://flagpedia.net/data/flags/w702/br.webp",
     chose: [
@@ -289,7 +290,6 @@ const countries = [
     ]
   },
   {
-    id: 6,
     flag: "Russia",
     image: "https://flagpedia.net/data/flags/w702/ru.webp",
     chose: [
@@ -312,7 +312,6 @@ const countries = [
     ]
   },
   {
-    id: 7,
     flag: "China",
     image: "https://flagpedia.net/data/flags/w702/cn.webp",
     chose: [
@@ -335,7 +334,6 @@ const countries = [
     ]
   },
   {
-    id: 8,
     flag: "Germany",
     image: "https://flagpedia.net/data/flags/w702/de.webp",
     chose: [
@@ -358,7 +356,6 @@ const countries = [
     ]
   },
   {
-    id: 9,
     flag: "United Kingdom",
     image: "https://flagpedia.net/data/flags/w702/gb.webp",
     chose: [
@@ -381,7 +378,6 @@ const countries = [
     ]
   },
   {
-    id: 10,
     flag: "India",
     image: "https://flagpedia.net/data/flags/w702/in.webp",
     chose: [
@@ -405,7 +401,6 @@ const countries = [
   },
 
   {
-    id: 13,
     flag: "South Africa",
     image: "https://flagpedia.net/data/flags/w702/za.webp",
     chose: [
@@ -428,7 +423,6 @@ const countries = [
     ]
   },
   {
-    id: 14,
     flag: "Egypt",
     image: "https://flagpedia.net/data/flags/w702/eg.webp",
     chose: [
@@ -451,7 +445,6 @@ const countries = [
     ]
   },
   {
-    id: 15,
     flag: "Turkey",
     image: "https://flagpedia.net/data/flags/w702/tr.webp",
     chose: [
@@ -474,30 +467,6 @@ const countries = [
     ]
   },
   {
-    id: 16,
-    flag: "Thailand",
-    image: "https://flagpedia.net/data/flags/w702/th.webp",
-    chose: [
-      {
-        name: "Thailand",
-        correct: true
-      },
-      {
-        name: "Vietnam",
-        correct: false
-      },
-      {
-        name: "Cambodia",
-        correct: false
-      },
-      {
-        name: "Laos",
-        correct: false
-      }
-    ]
-  },
-  {
-    id: 17,
     flag: "Indonesia",
     image: "https://flagpedia.net/data/flags/w702/id.webp",
     chose: [
@@ -520,30 +489,6 @@ const countries = [
     ]
   },
   {
-    id: 17,
-    flag: "Indonesia",
-    image: "https://flagpedia.net/data/flags/w702/id.webp",
-    chose: [
-      {
-        name: "Indonesia",
-        correct: true
-      },
-      {
-        name: "Philippines",
-        correct: false
-      },
-      {
-        name: "Thailand",
-        correct: false
-      },
-      {
-        name: "Malaysia",
-        correct: false
-      }
-    ]
-  },
-  {
-    id: 18,
     flag: "Germany",
     image: "https://flagpedia.net/data/flags/w702/de.webp",
     chose: [
@@ -566,30 +511,6 @@ const countries = [
     ]
   },
   {
-    id: 20,
-    flag: "South Korea",
-    image: "https://flagpedia.net/data/flags/w702/kr.webp",
-    chose: [
-      {
-        name: "South Korea",
-        correct: true
-      },
-      {
-        name: "North Korea",
-        correct: false
-      },
-      {
-        name: "Japan",
-        correct: false
-      },
-      {
-        name: "Taiwan",
-        correct: false
-      }
-    ]
-  },
-  {
-    id: 21,
     flag: "Mexico",
     image: "https://flagpedia.net/data/flags/w702/mx.webp",
     chose: [
@@ -612,30 +533,6 @@ const countries = [
     ]
   },
   {
-    id: 22,
-    flag: "Saudi Arabia",
-    image: "https://flagpedia.net/data/flags/w702/sa.webp",
-    chose: [
-      {
-        name: "Saudi Arabia",
-        correct: true
-      },
-      {
-        name: "Oman",
-        correct: false
-      },
-      {
-        name: "Qatar",
-        correct: false
-      },
-      {
-        name: "Kuwait",
-        correct: false
-      }
-    ]
-  },
-  {
-    id: 23,
     flag: "Spain",
     image: "https://flagpedia.net/data/flags/w702/es.webp",
     chose: [
@@ -658,7 +555,6 @@ const countries = [
     ]
   },
   {
-    id: 24,
     flag: "Thailand",
     image: "https://flagpedia.net/data/flags/w702/th.webp",
     chose: [
@@ -681,7 +577,6 @@ const countries = [
     ]
   },
   {
-    id: 25,
     flag: "Australia",
     image: "https://flagpedia.net/data/flags/w702/au.webp",
     chose: [
@@ -704,7 +599,6 @@ const countries = [
     ]
   },
   {
-    id: 26,
     flag: "South Korea",
     image: "https://flagpedia.net/data/flags/w702/kr.webp",
     chose: [
@@ -727,30 +621,6 @@ const countries = [
     ]
   },
   {
-    id: 27,
-    flag: "Egypt",
-    image: "https://flagpedia.net/data/flags/w702/eg.webp",
-    chose: [
-      {
-        name: "Egypt",
-        correct: true
-      },
-      {
-        name: "Morocco",
-        correct: false
-      },
-      {
-        name: "Algeria",
-        correct: false
-      },
-      {
-        name: "Tunisia",
-        correct: false
-      }
-    ]
-  },
-  {
-    id: 28,
     flag: "Nigeria",
     image: "https://flagpedia.net/data/flags/w702/ng.webp",
     chose: [
@@ -773,7 +643,6 @@ const countries = [
     ]
   },
   {
-    id: 29,
     flag: "Canada",
     image: "https://flagpedia.net/data/flags/w702/ca.webp",
     chose: [
@@ -796,30 +665,6 @@ const countries = [
     ]
   },
   {
-    id: 30,
-    flag: "Singapore",
-    image: "https://flagpedia.net/data/flags/w702/sg.webp",
-    chose: [
-      {
-        name: "Singapore",
-        correct: true
-      },
-      {
-        name: "Malaysia",
-        correct: false
-      },
-      {
-        name: "Thailand",
-        correct: false
-      },
-      {
-        name: "Indonesia",
-        correct: false
-      }
-    ]
-  },
-  {
-    id: 31,
     flag: "Switzerland",
     image: "https://flagpedia.net/data/flags/w702/ch.webp",
     chose: [
@@ -842,7 +687,6 @@ const countries = [
     ]
   },
   {
-    id: 32,
     flag: "New Zealand",
     image: "https://flagpedia.net/data/flags/w702/nz.webp",
     chose: [
@@ -865,7 +709,6 @@ const countries = [
     ]
   },
   {
-    id: 33,
     flag: "Norway",
     image: "https://flagpedia.net/data/flags/w702/no.webp",
     chose: [
@@ -888,7 +731,6 @@ const countries = [
     ]
   },
   {
-    id: 34,
     flag: "Poland",
     image: "https://flagpedia.net/data/flags/w702/pl.webp",
     chose: [
@@ -911,7 +753,6 @@ const countries = [
     ]
   },
   {
-    id: 35,
     flag: "Portugal",
     image: "https://flagpedia.net/data/flags/w702/pt.webp",
     chose: [
@@ -934,7 +775,6 @@ const countries = [
     ]
   },
   {
-    id: 37,
     flag: "Saudi Arabia",
     image: "https://flagpedia.net/data/flags/w702/sa.webp",
     chose: [
@@ -957,7 +797,6 @@ const countries = [
     ]
   },
   {
-    id: 38,
     flag: "Singapore",
     image: "https://flagpedia.net/data/flags/w702/sg.webp",
     chose: [
@@ -975,6 +814,160 @@ const countries = [
       },
       {
         name: "Vietnam",
+        correct: false
+      }
+    ]
+  },
+  {
+    flag: "Cuba",
+    image: "https://flagpedia.net/data/flags/w702/cu.webp",
+    chose: [
+      {
+        name: "Cuba",
+        correct: true
+      },
+      {
+        name: "Dominican Republic",
+        correct: false
+      },
+      {
+        name: "Jamaica",
+        correct: false
+      },
+      {
+        name: "Honduras",
+        correct: false
+      }
+    ]
+  },
+  {
+    flag: "Jamaica",
+    image: "https://flagpedia.net/data/flags/w702/jm.webp",
+    chose: [
+      {
+        name: "Jamaica",
+        correct: true
+      },
+      {
+        name: "Barbados",
+        correct: false
+      },
+      {
+        name: "Trinidad và Tobago",
+        correct: false
+      },
+      {
+        name: "Haiti",
+        correct: false
+      }
+    ]
+  },
+  {
+    flag: "Haiti",
+    image: "https://flagpedia.net/data/flags/w702/ht.webp",
+    chose: [
+      {
+        name: "Haiti",
+        correct: true
+      },
+      {
+        name: "Belize",
+        correct: false
+      },
+      {
+        name: "El Salvador",
+        correct: false
+      },
+      {
+        name: "Nicaragua",
+        correct: false
+      }
+    ]
+  },
+  {
+    flag: "Bahamas",
+    image: "https://flagpedia.net/data/flags/w702/bs.webp",
+    chose: [
+      {
+        name: "Bahamas",
+        correct: true
+      },
+      {
+        name: "Costa Rica",
+        correct: false
+      },
+      {
+        name: "Guatemala",
+        correct: false
+      },
+      {
+        name: "Panama",
+        correct: false
+      }
+    ]
+  },
+  {
+    flag: "Dominican Republic",
+    image: "https://flagpedia.net/data/flags/w702/do.webp",
+    chose: [
+      {
+        name: "Dominican Republic",
+        correct: true
+      },
+      {
+        name: "Cuba",
+        correct: false
+      },
+      {
+        name: "Trinidad và Tobago",
+        correct: false
+      },
+      {
+        name: "Belize",
+        correct: false
+      }
+    ]
+  },
+  {
+    flag: "Trinidad và Tobago",
+    image: "https://flagpedia.net/data/flags/w702/tt.webp",
+    chose: [
+      {
+        name: "Trinidad và Tobago",
+        correct: true
+      },
+      {
+        name: "Honduras",
+        correct: false
+      },
+      {
+        name: "Barbados",
+        correct: false
+      },
+      {
+        name: "El Salvador",
+        correct: false
+      }
+    ]
+  },
+  {
+    flag: "Barbados",
+    image: "https://flagpedia.net/data/flags/w702/bb.webp",
+    chose: [
+      {
+        name: "Barbados",
+        correct: true
+      },
+      {
+        name: "Costa Rica",
+        correct: false
+      },
+      {
+        name: "Guatemala",
+        correct: false
+      },
+      {
+        name: "Panama",
         correct: false
       }
     ]
