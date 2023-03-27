@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, TouchableOpacity, StyleSheet, Text, View, Image, useWindowDimensions, Modal, Pressable, Alert, ToastAndroid } from 'react-native';
-import { AsyncStorage } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
   const { height, width } = useWindowDimensions();
@@ -11,18 +11,36 @@ export default function App() {
   const isCorrect = useRef(false);
   const nameCorrect = useRef('');
   const indexCountry = useRef(0);
-  const fetchData = () => {
-    countries.sort(() => Math.random() - 0.5);
-    setCountry(countries[0]);
-    const arrChose0 = countries[0].chose;
-    arrChose0.sort(() => Math.random() - 0.5);
-    setArrChose(arrChose0);
-    indexCountry.current = 0;
-    arrChose0.forEach(element => {
-      if (element.correct == true) {
-        nameCorrect.current = element.name;
-      }
-    });
+  const scoreData = useRef({
+    scoreCorrect: 0,
+    scoreInCorrect: 0
+  });
+
+  const fetchData = async () => {
+    try {
+      await AsyncStorage.getItem('score')
+        .then(value => {
+          const myObject = JSON.parse(value);
+          if (myObject == null) {
+          } else {
+            scoreData.current = myObject;
+          }
+        });
+      countries.sort(() => Math.random() - 0.5);
+      setCountry(countries[0]);
+      const arrChose0 = countries[0].chose;
+      arrChose0.sort(() => Math.random() - 0.5);
+      setArrChose(arrChose0);
+      indexCountry.current = 0;
+      arrChose0.forEach(element => {
+        if (element.correct == true) {
+          nameCorrect.current = element.name;
+        }
+      });
+    } catch (error) {
+      console.log(error)
+    }
+
   }
   useEffect(() => {
     fetchData();
@@ -31,6 +49,13 @@ export default function App() {
   const onCheckCorrect = (correct, index) => {
     isCorrect.current = correct;
     setIsShowModal(true);
+    if (correct) {
+      scoreData.current.scoreCorrect++;
+    } else {
+      scoreData.current.scoreInCorrect++;
+    }
+    console.log(scoreData.current);
+    updateCore();
   }
   const onNextQuizz = () => {
     if (indexCountry.current >= countries.length - 1) {
@@ -50,12 +75,17 @@ export default function App() {
       }
     });
     setIsShowModal(false);
-    console.log(indexCountry.current);
-    console.log(countries[0]);
-
+  }
+  const updateCore = () => {
+    try {
+      AsyncStorage.setItem('score', JSON.stringify(scoreData.current));
+    } catch (error) {
+      console.log(error)
+    }
   }
   return (
     <View>
+
       <ScrollView>
         <View style={[styles.container, { minWidth: width, minHeight: height }]}>
           <StatusBar style="light" translucent={true} />
@@ -74,6 +104,10 @@ export default function App() {
           </View>
         </View>
       </ScrollView>
+      <View style={styles.boxScore}>
+        <Text style={styles.textScore}>Correct: {scoreData.current.scoreCorrect}</Text>
+        <Text style={styles.textScore}>InCorrect: {scoreData.current.scoreInCorrect}</Text>
+      </View>
       <Modal
         animationType="fade"
         transparent={true}
@@ -103,6 +137,16 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  textScore: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  boxScore: {
+    position: 'absolute',
+    top: 26,
+    left: 26,
+  },
   textClose: {
     color: 'white',
     fontSize: 16,
